@@ -2,6 +2,7 @@ package tunnel_client
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -30,7 +31,12 @@ func NewTunnelClient(opts TunnelClientOptions) *TunnelClient {
 func (tc *TunnelClient) Connect() {
 	for {
 		log.Println("Attempting to connect to server...")
-		conn, err := net.Dial("tcp", tc.URL)
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: true, // Note: In production, you should verify certificates
+		}
+
+		// Connect with TLS
+		conn, err := tls.Dial("tcp", tc.URL, tlsConfig)
 		if err != nil {
 			log.Printf("Failed to connect: %v. Retrying in 3 seconds...", err)
 			time.Sleep(3 * time.Second)
