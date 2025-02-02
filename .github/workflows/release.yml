@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write # Add this permission block
+  contents: write
 
 jobs:
   build:
@@ -22,14 +22,20 @@ jobs:
       - name: Build for multiple platforms
         run: |
           mkdir -p builds
+          # Linux build
           GOOS=linux GOARCH=amd64 go build -o builds/tcp_client_linux_amd64 .
+          # Windows build
           GOOS=windows GOARCH=amd64 go build -o builds/tcp_client_windows_amd64.exe .
-          GOOS=darwin GOARCH=amd64 go build -o builds/tcp_client_darwin_amd64 .
+          # MacOS build with additional flags
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s" -o builds/tcp_client_darwin_amd64 .
+          cd builds && zip tcp_client_darwin_amd64.zip tcp_client_darwin_amd64 && cd ..
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            builds/*
+            builds/tcp_client_linux_amd64
+            builds/tcp_client_windows_amd64.exe
+            builds/tcp_client_darwin_amd64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
