@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	tc "tcp_client/tunnel_client"
@@ -12,13 +13,11 @@ import (
 
 func main() {
 
-	tunnelURL := flag.String("url", "64.226.105.234:9091", "URL for the tunnel server")
+	tunnelURL := flag.String("url", "_.edgesrc.com:9091", "URL for the tunnel server")
 	clientID := flag.String("client-id", "", "ID for the client")
 
 	flag.Parse()
-	if *clientID == "" {
-		log.Fatal("Client ID is required '-client-id=my-service'")
-	}
+
 	if *tunnelURL == "" {
 		log.Fatal("Tunnel URL is required '-url=127.2.3.4:9091'")
 	}
@@ -36,7 +35,7 @@ func main() {
 			"path":    r.URL.Path,
 			"method":  r.Method,
 		})
-
+		fmt.Printf("Http request: %s %s\n", r.Method, r.URL.Path)
 		w.Write(responseBody)
 	})
 	log.Printf("Starting HTTP server on :8081")
